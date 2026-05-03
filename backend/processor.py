@@ -18,7 +18,7 @@ def extrair_valor(texto: str) -> dict:
                 "valor": -numero if is_negativo else numero,
                 "sinal_inferido": False
             }
-        except:
+        except (ValueError, AttributeError):
             pass
 
     return {"valor": None, "sinal_inferido": True}
@@ -66,11 +66,13 @@ def processar_pdf(pdf_bytes: bytes, filtros: list[dict]) -> tuple[bytes, dict]:
             if not texto_bloco:
                 continue
 
+            texto_bloco_lower = texto_bloco.lower()
+
             for filtro in filtros:
                 keywords = filtro["keywords"]
                 cor_rgb = hex_para_rgb(filtro["cor"])
 
-                if any(kw.lower() in texto_bloco.lower() for kw in keywords):
+                if any(kw.lower() in texto_bloco_lower for kw in keywords):
                     bbox = fitz.Rect(bloco["bbox"])
                     bbox_completo = fitz.Rect(0, bbox.y0 - 2, largura_pagina, bbox.y1 + 2)
                     pagina.draw_rect(bbox_completo, color=cor_rgb, fill=cor_rgb, fill_opacity=0.4)
@@ -87,6 +89,7 @@ def processar_pdf(pdf_bytes: bytes, filtros: list[dict]) -> tuple[bytes, dict]:
                         "sinal_inferido": sinal_inferido
                     })
                     relatorio["grupos"][label]["total"] += 1
+                    relatorio["total_linhas_marcadas"] += 1
 
                     if valor is not None:
                         relatorio["grupos"][label]["soma"] += valor
@@ -102,8 +105,10 @@ def processar_pdf(pdf_bytes: bytes, filtros: list[dict]) -> tuple[bytes, dict]:
         if pagina_teve_match and (num_pagina + 1) not in relatorio["paginas_afetadas"]:
             relatorio["paginas_afetadas"].append(num_pagina + 1)
 
-    pdf_marcado = doc.tobytes()
-    doc.close()
+    try:
+        pdf_marcado = doc.tobytes()
+    finally:
+        doc.close()
     return pdf_marcado, relatorio
 
 def gerar_excel(relatorio: dict) -> bytes:
@@ -140,8 +145,18 @@ def gerar_excel(relatorio: dict) -> bytes:
         ws_resumo.cell(row=row, column=4, value=fmt(grupo["total_debitos"])).fill = grupo_fill
         ws_resumo.cell(row=row, column=5, value=fmt(grupo["soma"])).fill = grupo_fill
 
+    nomes_usados: set[str] = {"Resumo"}
+
     for label, grupo in relatorio["grupos"].items():
-        ws = wb.create_sheet(label[:31])
+        nome_base = label[:31]
+        nome = nome_base
+        contador = 1
+        while nome in nomes_usados:
+            contador += 1
+            sufixo = f"_{contador}"
+            nome = label[:31 - len(sufixo)] + sufixo
+        nomes_usados.add(nome)
+        ws = wb.create_sheet(nome)
         ws.column_dimensions["A"].width = 8
         ws.column_dimensions["B"].width = 60
         ws.column_dimensions["C"].width = 20
