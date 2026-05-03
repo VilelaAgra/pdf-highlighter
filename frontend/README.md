@@ -1,73 +1,77 @@
-# React + TypeScript + Vite
+# PDF Highlighter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ferramenta para marcação automática de extratos bancários em PDF.
 
-Currently, two official plugins are available:
+## O que é
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Sistema web que permite fazer upload de um extrato em PDF, definir grupos de palavras-chave com cores personalizadas, e receber o PDF com as linhas correspondentes destacadas — como um marca-texto — junto com um relatório financeiro por grupo.
 
-## React Compiler
+## O que entrega
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **PDF marcado** — com highlight colorido nas linhas que correspondem a cada grupo
+- **Relatório Excel** — com resumo de créditos, débitos e saldo líquido por grupo, e detalhe de cada linha encontrada
 
-## Expanding the ESLint configuration
+## Como usar
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Acesse o sistema
+2. Faça upload do extrato em PDF
+3. Crie grupos de busca — defina um nome, uma cor e as palavras-chave de cada grupo (ex: grupo "Entradas" com keywords "Crédito, PIX, Entrada")
+4. Clique em **Processar PDF**
+5. Baixe o PDF marcado e/ou o relatório Excel
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Observações
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Funciona com PDFs que contenham texto selecionável — PDFs escaneados (foto) não são suportados
+- O sistema não armazena nenhum arquivo — o PDF é processado e descartado imediatamente
+- Valores sem sinal explícito no extrato são sinalizados no relatório Excel para conferência manual
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Stack
+
+- **Backend:** Python + FastAPI + PyMuPDF + OpenPyXL
+- **Frontend:** React + TypeScript + Vite + Tailwind CSS
+- **Deploy:** Render (backend) + Vercel (frontend)
+
+## Como rodar localmente
+
+### Backend
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Sobe em `http://localhost:8000`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Frontend
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Sobe em `http://localhost:5173`
+
+## Estrutura
+
+```
+pdf-highlighter/
+├── backend/
+│   ├── main.py          # API FastAPI
+│   ├── processor.py     # Lógica de PDF e Excel
+│   └── requirements.txt
+└── frontend/
+    └── src/
+        ├── App.tsx
+        ├── components/
+        │   ├── Upload.tsx
+        │   ├── Config.tsx
+        │   ├── Report.tsx
+        │   ├── PdfViewer.tsx
+        │   └── ProgressBar.tsx
+        └── utils/
+            └── format.ts
 ```
