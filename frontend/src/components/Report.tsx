@@ -1,3 +1,5 @@
+import { formatarMoeda } from "../utils/format"
+
 interface Linha {
     pagina: number
     texto: string
@@ -40,10 +42,6 @@ function baixarArquivo(base64: string, nome: string, tipo: string) {
     URL.revokeObjectURL(url)
 }
 
-function fmt(valor: number): string {
-    return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-}
-
 export default function Report({ relatorio, pdfBase64, excelBase64 }: Props) {
     const totalInferidos = Object.values(relatorio.grupos)
         .flatMap(g => g.linhas)
@@ -78,7 +76,7 @@ export default function Report({ relatorio, pdfBase64, excelBase64 }: Props) {
                                 <p className="text-xs text-gray-400">{grupo.total} linha{grupo.total !== 1 ? "s" : ""}</p>
                             </div>
                             <p className={`text-sm font-semibold ${grupo.soma >= 0 ? "text-green-600" : "text-red-500"}`}>
-                                {fmt(grupo.soma)}
+                                {formatarMoeda(grupo.soma)}
                             </p>
                         </div>
 
@@ -86,11 +84,11 @@ export default function Report({ relatorio, pdfBase64, excelBase64 }: Props) {
                             <div className="flex border-t border-gray-100">
                                 <div className="flex-1 px-4 py-2 bg-gray-50">
                                     <p className="text-xs text-gray-400">Créditos</p>
-                                    <p className="text-xs font-medium text-green-600">{fmt(grupo.total_creditos)}</p>
+                                    <p className="text-xs font-medium text-green-600">{formatarMoeda(grupo.total_creditos)}</p>
                                 </div>
                                 <div className="flex-1 px-4 py-2 bg-gray-50 border-l border-gray-100">
                                     <p className="text-xs text-gray-400">Débitos</p>
-                                    <p className="text-xs font-medium text-red-500">{fmt(grupo.total_debitos)}</p>
+                                    <p className="text-xs font-medium text-red-500">{formatarMoeda(grupo.total_debitos)}</p>
                                 </div>
                             </div>
                         )}
@@ -102,7 +100,7 @@ export default function Report({ relatorio, pdfBase64, excelBase64 }: Props) {
                 <div className="flex justify-between items-center border-t border-gray-100 pt-4 mb-6">
                     <p className="text-sm text-gray-500">Saldo líquido geral</p>
                     <p className={`text-sm font-semibold ${relatorio.soma_valores >= 0 ? "text-green-600" : "text-red-500"}`}>
-                        {fmt(relatorio.soma_valores)}
+                        {formatarMoeda(relatorio.soma_valores)}
                     </p>
                 </div>
             )}

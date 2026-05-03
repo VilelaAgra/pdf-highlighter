@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Memeco\\\\Documents\\\\Memeco\\\\pdf-highlighter\" -Recurse -File)",
+      "Bash(Select-Object FullName)",
+      "Bash(ConvertTo-Json)",
+      "Bash(dir /s \"C:\\\\Users\\\\Memeco\\\\Documents\\\\Memeco\\\\pdf-highlighter\\\\backend\" /b)",
+      "Bash(findstr /E \"\\\\.py$\")"
+    ]
+  }
+}

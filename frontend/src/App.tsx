@@ -3,12 +3,7 @@ import Upload from "./components/Upload"
 import Config from "./components/Config"
 import Report from "./components/Report"
 import PdfViewer from "./components/PdfViewer"
-
-interface Filtro {
-    label: string
-    keywords: string
-    cor: string
-}
+import type { Filtro } from "./types"
 
 interface Resultado {
     relatorio: {
@@ -55,11 +50,14 @@ export default function App() {
         ))
 
         try {
-            const res = await fetch("http://localhost:8000/process", {
+            const res = await fetch("/api/process", {
                 method: "POST",
                 body: form,
             })
-            if (!res.ok) throw new Error("Erro ao processar o PDF")
+            if (!res.ok) {
+                const body = await res.json().catch(() => null)
+                throw new Error(body?.detail ?? `Erro ${res.status} ao processar o PDF`)
+            }
             const data: Resultado = await res.json()
             setResultado(data)
         } catch (e: unknown) {

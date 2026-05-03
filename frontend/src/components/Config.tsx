@@ -1,10 +1,5 @@
 import { useState } from "react"
-
-interface Filtro {
-    label: string
-    keywords: string
-    cor: string
-}
+import type { Filtro } from "../types"
 
 interface Props {
     nomeArquivo: string
