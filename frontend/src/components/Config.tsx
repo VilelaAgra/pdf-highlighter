@@ -105,7 +105,7 @@ export default function Config({ nomeArquivo, onProcessar, carregando, onTrocarA
                 disabled={!podeProcessar}
                 className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white text-sm font-medium py-2.5 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
             >
-                {carregando ? "Processando..." : "Processar PDF"}
+                {carregando ? "Processando PDF, aguarde..." : "Processar PDF"}
             </button>
         </div>
     )

@@ -3,6 +3,7 @@ import Upload from "./components/Upload"
 import Config from "./components/Config"
 import Report from "./components/Report"
 import PdfViewer from "./components/PdfViewer"
+import ProgressBar from "./components/ProgressBar"
 import type { Filtro } from "./types"
 
 interface Resultado {
@@ -75,6 +76,7 @@ export default function App() {
 
     return (
         <div className="min-h-screen bg-gray-50">
+            <ProgressBar ativo={carregando} />
             <div className="max-w-2xl mx-auto px-4 py-12">
                 <div className="mb-8">
                     <h1 className="text-2xl font-semibold text-gray-900">Marcador de Extratos PDF</h1>
