@@ -50,7 +50,7 @@ export default function App() {
         ))
 
         try {
-            const res = await fetch("/api/process", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/process`, {
                 method: "POST",
                 body: form,
             })
